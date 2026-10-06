@@ -259,7 +259,7 @@ fill 320×240, because there is no PSRAM for a full-resolution framebuffer.
 
 The upstream firmware was written first for an external sensor that talked to
 the Cardputer over UART, and later moved to on-device CSI. Two keys were left
-wired to the old link:
+wired to the old link, and the graph hid part of the signal:
 
 - **`c` (calibrate) did nothing.** It sent a `CAL` command through
   `RadarLink::send()`, which returns early when no UART was opened, and the
