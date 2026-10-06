@@ -1,0 +1,40 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.platformio
+          key: pio-${{ hashFiles('platformio.ini') }}
+
+      - name: Install PlatformIO
+        run: pip install platformio esptool
+
+      - name: Build firmware
+        run: pio run -e cardputer-radar-csi
+
+      - name: Merge binaries
+        run: |
+          python -m esptool --chip esp32s3 merge_bin \
+            -o cardputer-csi-${{ github.ref_name }}.bin \
+            --flash_mode qio --flash_size 8MB \
+            0x0000 .pio/build/cardputer-radar-csi/bootloader.bin \
+            0x8000 .pio/build/cardputer-radar-csi/partitions.bin \
+            0x10000 .pio/build/cardputer-radar-csi/firmware.bin
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: cardputer-csi-${{ github.ref_name }}.bin
+          generate_release_notes: true
