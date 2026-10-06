@@ -12,12 +12,13 @@ display and an external 2.4" ILI9341 used as a radar scope.
 
 > **Credits.** The firmware is the work of **TalkingSasquach**
 > ([skizzophrenic/Cardputer-CSI-Human-Detector](https://github.com/skizzophrenic/Cardputer-CSI-Human-Detector)),
-> released under the MIT License. The code in `src/` and `include/` is the
-> upstream **v1.2.0** source (release tag `28c9502`; the later commit `aec88e0`
-> only adds an unrelated HTML page), unchanged. What this repository
-> adds is the hardware documentation for my setup, the wiring for this specific
-> display module, the install path through M5Launcher, and an explanation of
-> how the detection and the scope actually work, based on reading the source.
+> released under the MIT License. This repository starts from the upstream
+> **v1.2.0** source (release tag `28c9502`). On top of it I added the hardware
+> documentation for my setup, the wiring for this display module, the install
+> path through M5Launcher, an explanation of how the detection and the scope
+> work, and a few firmware fixes: in the on-device CSI build the calibrate and
+> threshold keys did nothing, and the motion graph hid everything below the
+> threshold (see [Changes from upstream](#changes-from-upstream)).
 
 ---
 
@@ -154,8 +155,8 @@ ILI9341 yet.
 |-----|--------|
 | `.` | Switch the external display between the radar scope and the 3D view |
 | `` ` `` | Open / save-and-close the settings menu |
-| `,` and `/` | Move the threshold line on the motion graph down / up |
-| `c` | Calibration request (see the notes below) |
+| `,` and `/` | Lower / raise the presence threshold (5 % to 95 %, saved across reboots) |
+| `c` | Calibrate: re-learn the empty room for 5 seconds |
 
 Inside the settings menu: `;` and `.` move between items, `,` and `/` change
 the value, `` ` `` saves. The menu holds the colour palette, the brightness of
@@ -200,7 +201,8 @@ blended **60 % amplitude + 40 % phase** into the motion score.
 
 `serviceCsi()` samples that score at about **15 Hz**:
 
-- above **0.15** → presence is set and a 10-second hold starts;
+- above the **threshold** (default 0.15, adjustable with `,` and `/`) →
+  presence is set and a 10-second hold starts;
 - below it, presence stays on while the hold counts down, with the motion
   value fading toward 10 % of its last peak;
 - when the hold runs out, the status returns to CLEAR.
@@ -249,24 +251,53 @@ fill 320×240, because there is no PSRAM for a full-resolution framebuffer.
 
 ---
 
-## Notes from reading the code
+## Changes from upstream
 
-Things that are not obvious from the UI:
+The upstream firmware was written first for an external sensor that talked to
+the Cardputer over UART, and later moved to on-device CSI. Two keys were left
+wired to the old link:
 
-- **`c` (calibrate) has no effect in this build.** It sends a `CAL` command
-  over a UART link that is only opened in the external-sensor build. In the
-  on-device CSI build that link is never started, so the command goes
-  nowhere. The adaptive normalization in step 2 is what plays the role of
-  calibration.
-- **`,` and `/` do not change detection.** They move the threshold line and
-  the graph colours, but presence is decided by the fixed `0.15` in
-  `serviceCsi()`.
+- **`c` (calibrate) did nothing.** It sent a `CAL` command through
+  `RadarLink::send()`, which returns early when no UART was opened, and the
+  on-device build never opens one.
+- **`,` and `/` did not change detection.** They moved the line on the graph,
+  but `serviceCsi()` compared the motion score against a fixed `0.15`.
+- **The graph was flat below the threshold.** When there was no presence,
+  `serviceCsi()` reported a motion of `0`, so the graph only showed bars
+  once detection had already triggered. With a saved threshold this became
+  visible: after a reboot at a high threshold the device sat on CLEAR with an
+  empty graph, which looked like it was not measuring at all.
+
+What I changed in `src/main.cpp`:
+
+- `serviceCsi()` now uses `gThreshold`, so the keys change the actual
+  sensitivity. The default stays at 0.15, so out of the box it behaves like
+  upstream. The value is stored in NVS with the other settings.
+- `c` starts a 5-second calibration. The CSI callback resets its sliding
+  windows and adaptive floor/peak, and presence stays off while they re-learn
+  the room. The status pill shows **CAL** during this time. The reset is done
+  inside the callback through a flag, because the callback runs in the WiFi
+  task and the buffers should not be cleared from the main loop mid-frame.
+- When there is no presence, the raw motion score is passed through, so the
+  graph always shows the room's activity: blue under the threshold line, pink
+  above it. That makes it possible to set the line just above the noise.
+- The UART and fake-data builds keep their original behaviour.
+
+## Practical notes
+
 - **Moving the device invalidates everything.** The whole method measures
   changes in the channel between the device and the access point. Carrying it
   around changes that channel more than any person in the room does. For
   meaningful readings, leave it still and let the room do the moving.
 - **Position matters.** Detection is strongest when people move through the
   path between the Cardputer and the access point.
+- **Signal strength matters too.** The firmware gives the saved network 10
+  seconds to connect before opening the network picker, and CSI is measured
+  on every frame received from the access point. With a router far away the
+  join is slow and few frames arrive, so the graph barely moves. A phone or
+  PC hotspot a few metres away worked much better in my tests; some traffic
+  on that hotspot (a video playing on another device) gives a steadier
+  reading.
 
 ---
 

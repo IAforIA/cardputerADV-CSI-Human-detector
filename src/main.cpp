@@ -60,12 +60,27 @@ static float      gCsiVarMax   = 0.001f;
 static float      gCsiVarMin   = 0.0f;
 static float      gCsiPhaVarMax = 0.001f;
 static float      gCsiPhaVarMin = 0.0f;
-static const float kCsiThresh  = 0.15f;
+static const float kCsiThresh  = 0.15f;   // default presence threshold (gThreshold)
+
+// Set by the main loop to restart the baseline. The callback runs in the WiFi
+// task, so it clears its own buffers on the next frame instead of the loop
+// touching them while a frame is being processed.
+static volatile bool gCsiResetReq = false;
+
+static void IRAM_ATTR csiResetBaseline() {
+    gCsiAmpIdx = 0; gCsiAmpFilled = 0;
+    gCsiVarMax = 0.001f; gCsiVarMin = 0.0f;
+    gCsiPhaVarMax = 0.001f; gCsiPhaVarMin = 0.0f;
+    memset(gCsiAmpBuf, 0, sizeof(gCsiAmpBuf));
+    memset(gCsiPhaBuf, 0, sizeof(gCsiPhaBuf));
+    gCsiMotion = 0.0f;
+}
 
 static void IRAM_ATTR promiscuousRxCb(void*, wifi_promiscuous_pkt_type_t) {}
 
 static void IRAM_ATTR csiCallback(void*, wifi_csi_info_t* info) {
     if (!info || !info->buf || info->len < 4) return;
+    if (gCsiResetReq) { csiResetBaseline(); gCsiResetReq = false; }
     gCsiCount++;
     int8_t* b   = info->buf;
     int  nPairs = info->len / 2;
@@ -139,7 +154,11 @@ static M5Canvas        canvas(&M5Cardputer.Display);   // bottom (built-in) buff
 static LGFX_ExtILI9341 extPanel;                       // external 2.8" ILI9341
 static M5Canvas        topCanvas(&extPanel);           // top render buffer (240x180)
 static bool            extReady   = false;
+#if defined(RADAR_CSI)
+static float           gThreshold = kCsiThresh;        // drives presence in serviceCsi()
+#else
 static float           gThreshold = 0.35f;
+#endif
 static const float     EXT_ZOOM   = 320.0f / 240.0f;   // 240x180 * 1.333 = 320x240, fills panel
 
 // ── Color palettes & runtime settings ─────────────────────────────────────────
@@ -202,6 +221,7 @@ static void saveSettings() {
     prefs.putUChar("palette",   gColorIdx);
     prefs.putUChar("bright",    gBright);
     prefs.putUChar("extbright", gExtBright);
+    prefs.putFloat("thr",       gThreshold);
     prefs.end();
 }
 
@@ -211,7 +231,10 @@ static void loadSettings() {
     gColorIdx  = prefs.getUChar("palette",   0);
     gBright    = prefs.getUChar("bright",   80);
     gExtBright = prefs.getUChar("extbright",80);
+    const float thrDefault = gThreshold;
+    gThreshold = prefs.getFloat("thr",      thrDefault);
     prefs.end();
+    if (gThreshold < 0.05f || gThreshold > 0.95f) gThreshold = thrDefault;
     if (gColorIdx >= kNumPalettes) gColorIdx = 0;
     if (gBright    < 10 || gBright    > 100) gBright    = 80;
     if (gExtBright < 10 || gExtBright > 100) gExtBright = 80;
@@ -348,11 +371,8 @@ static void saveWifiCreds(const char* ssid, const char* pass) {
 static void IRAM_ATTR sniffCallback(void*, wifi_promiscuous_pkt_type_t);  // defined later
 
 static void enableCsi() {
-    gCsiAmpIdx = 0; gCsiAmpFilled = 0;
-    gCsiVarMax = 0.001f; gCsiVarMin = 0.0f;
-    gCsiPhaVarMax = 0.001f; gCsiPhaVarMin = 0.0f;
-    memset(gCsiAmpBuf, 0, sizeof(gCsiAmpBuf));
-    memset(gCsiPhaBuf, 0, sizeof(gCsiPhaBuf));
+    csiResetBaseline();
+    gCsiResetReq = false;
     esp_wifi_set_promiscuous(true);
     esp_wifi_set_promiscuous_rx_cb(promiscuousRxCb);
     wifi_csi_config_t cfg = {};
@@ -570,6 +590,18 @@ static void initCsi() {
     Serial.println("# CSI active");
 }
 
+// Calibration: restart the baseline and keep presence off for kCalMs while the
+// adaptive floor/peak re-learn the room. The room should be empty meanwhile.
+static const uint32_t kCalMs       = 5000;
+static bool           gCalibrating = false;
+static uint32_t       gCalStart    = 0;
+
+static void startCsiCalibration() {
+    gCsiResetReq = true;
+    gCalibrating = true;
+    gCalStart    = millis();
+}
+
 static void serviceCsi() {
     static uint32_t seq        = 0;
     static uint32_t last       = 0;
@@ -584,7 +616,8 @@ static void serviceCsi() {
     if (!wifiReady || WiFi.status() != WL_CONNECTED) {
         if (wifiReady) {
             // WiFi just dropped — stop CSI and clear frozen state
-            wifiReady  = false;
+            wifiReady    = false;
+            gCalibrating = false;
             holdCnt    = 0;
             heldMotion = 0.0f;
             esp_wifi_set_csi(false);
@@ -598,9 +631,22 @@ static void serviceCsi() {
     // Once motion is detected, presence coasts for ~10 s so a still person stays
     // on the scope. Motion decays from its peak toward 10% so the blip fades
     // gracefully rather than snapping off.
+    if (gCalibrating) {
+        if (now - gCalStart < kCalMs) {
+            holdCnt    = 0;
+            heldMotion = 0.0f;
+            char line[48];
+            snprintf(line, sizeof(line), "R,%lu,0,%.3f,%d,CAL",
+                     (unsigned long)(++seq), (float)gCsiMotion, (int)gCsiRssi);
+            radar.injectLine(line);
+            return;
+        }
+        gCalibrating = false;
+    }
+
     float m = gCsiMotion;
     bool present;
-    if (m > kCsiThresh) {
+    if (m > gThreshold) {
         holdCnt    = kHold;
         heldMotion = m;
         present    = true;
@@ -610,8 +656,9 @@ static void serviceCsi() {
         m       = heldMotion * (0.10f + 0.90f * fade);
         present = true;
     } else {
+        // Keep the raw score so the graph shows activity under the threshold
+        // line; without it the line cannot be tuned against the room's noise.
         present = false;
-        m       = 0.0f;
     }
 
     char line[48];
@@ -1671,6 +1718,17 @@ static void serviceKeys() {
     } else {
       if      (c == '`')             { gMenuOpen = true; gMenuCursor = 0; }
       else if (c == '.')             gViewMode = (gViewMode + 1) % 2;
+#if defined(RADAR_CSI)
+      // On-device CSI has no UART link: calibrate and threshold act locally.
+      else if (c == 'c' || c == 'C') startCsiCalibration();
+      else if (c == ',') {
+        gThreshold -= 0.05f; if (gThreshold < 0.05f) gThreshold = 0.05f;
+        saveSettings();
+      } else if (c == '/') {
+        gThreshold += 0.05f; if (gThreshold > 0.95f) gThreshold = 0.95f;
+        saveSettings();
+      }
+#else
       else if (c == 'c' || c == 'C') radar.calibrate();
       else if (c == ',') {
         gThreshold -= 0.05f; if (gThreshold < 0.05f) gThreshold = 0.05f;
@@ -1683,6 +1741,7 @@ static void serviceKeys() {
         radar.setThreshold(gThreshold);
 #endif
       }
+#endif
     }
   }
 }
