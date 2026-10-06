@@ -13,7 +13,8 @@ display and an external 2.4" ILI9341 used as a radar scope.
 > **Credits.** The firmware is the work of **TalkingSasquach**
 > ([skizzophrenic/Cardputer-CSI-Human-Detector](https://github.com/skizzophrenic/Cardputer-CSI-Human-Detector)),
 > released under the MIT License. The code in `src/` and `include/` is the
-> upstream **v1.2.0** source (commit `aec88e0`), unchanged. What this repository
+> upstream **v1.2.0** source (release tag `28c9502`; the later commit `aec88e0`
+> only adds an unrelated HTML page), unchanged. What this repository
 > adds is the hardware documentation for my setup, the wiring for this specific
 > display module, the install path through M5Launcher, and an explanation of
 > how the detection and the scope actually work, based on reading the source.
