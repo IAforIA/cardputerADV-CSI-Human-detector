@@ -1,13 +1,17 @@
 // =============================================================================
 // WiFi-CSI Radar — dual-screen console (Cardputer ADV)
 //
-//   * External 2.8" ILI9341 (top): PPI-style radar scope (sweep + contacts).
+//   * External ILI9341 240x320 (top): PPI-style radar scope (sweep + contacts).
+//     Built and tested with a 2.4" module; the original build used a 2.8" one.
 //   * Built-in screen (bottom): status pill, PRESENCE/CLEAR, motion graph, keys.
 //
-//   RADAR_FAKE = 1 (default): synthesizes data, NO sensor needed.
-//   RADAR_FAKE = 0          : live frames from the Monster C5 over Serial1/Grove.
+//   Data sources (set in platformio.ini):
+//   RADAR_CSI = 1           : on-device CSI sensing (env cardputer-radar-csi).
+//   RADAR_FAKE = 1          : synthesized data, no sensor needed.
+//   RADAR_FAKE = 0, no CSI  : frames from an external sensor over Serial1/Grove.
 //
-// Keys:  c = calibrate    , = threshold-    / = threshold+    ` = settings menu
+// Keys:  c = calibrate    , = threshold-    / = threshold+
+//        . = scope / 3-D view    ` = settings menu
 // =============================================================================
 #include <M5Cardputer.h>
 #include <M5Unified.h>
@@ -151,7 +155,7 @@ static void IRAM_ATTR csiCallback(void*, wifi_csi_info_t* info) {
 static RadarLink       radar;
 
 static M5Canvas        canvas(&M5Cardputer.Display);   // bottom (built-in) buffer
-static LGFX_ExtILI9341 extPanel;                       // external 2.8" ILI9341
+static LGFX_ExtILI9341 extPanel;                       // external ILI9341 240x320
 static M5Canvas        topCanvas(&extPanel);           // top render buffer (240x180)
 static bool            extReady   = false;
 #if defined(RADAR_CSI)
@@ -1035,7 +1039,7 @@ static void drawRain(uint32_t now) {
 // =============================================================================
 // Vaporwave 3-D view: sunset sky + full-floor radar + ghost avatar + sky FX.
 // Third-person: WE stand in the center; contacts appear all 360° around us.
-// Keys: , or . to toggle modes.
+// Key: . toggles between the scope and this view.
 // =============================================================================
 
 // Cute ghost avatar — we are the sensor origin.  cy = body centre.

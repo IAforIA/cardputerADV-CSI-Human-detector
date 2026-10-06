@@ -31,8 +31,9 @@ display and an external 2.4" ILI9341 used as a radar scope.
 | Extras on the display board | XPT2046 touch controller and microSD slot, both unused here |
 | Wiring | 8 male-to-female jumpers (the display has male pins, the Cardputer header is female) |
 
-The firmware's panel driver says "2.8 inch", but anything ILI9341 at 240×320
-works the same way. The 2.4" module was used for this build.
+The original build used a 2.8" panel. This one uses a 2.4" module: both are
+ILI9341 at 240×320 with the same pinout, so the firmware drives them the same
+way. Only the physical size changes.
 
 ---
 

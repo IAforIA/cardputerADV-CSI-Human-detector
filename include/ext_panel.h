@@ -1,7 +1,8 @@
 #ifndef EXT_PANEL_H
 #define EXT_PANEL_H
 //
-// External 2.8" ILI9341 (240x320) panel driver for the Cardputer ADV.
+// External ILI9341 (240x320) panel driver for the Cardputer ADV.
+// Works with the common 2.4" and 2.8" SPI modules (same controller and resolution).
 //
 // Wiring (EXT header): CS=GPIO5 RST=GPIO3 DC=GPIO6 MOSI=GPIO14 SCK=GPIO40
 // Bus: SPI2_HOST (FSPI), shared with SD (bus_shared=true). Run at rotation 7.
