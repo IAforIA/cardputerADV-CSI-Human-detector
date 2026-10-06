@@ -105,13 +105,17 @@ G12 for the SD), so both coexist.
 
 ## Installing the firmware
 
-The upstream release ships a single merged image (bootloader + partition table
-+ app) meant to be written at offset `0x0`. Two ways to get it onto the device:
+The [releases page](https://github.com/IAforIA/cardputerADV-CSI-Human-detector/releases)
+has a single merged image (bootloader + partition table + app) built from this
+repository, meant to be written at offset `0x0`. The original firmware, without
+the fixes described below, is in the
+[upstream releases](https://github.com/skizzophrenic/Cardputer-CSI-Human-Detector/releases).
+Two ways to get it onto the device:
 
 ### Option A: browser flasher (replaces everything on the flash)
 
 1. Download the `.bin` from the
-   [upstream releases](https://github.com/skizzophrenic/Cardputer-CSI-Human-Detector/releases).
+   [latest release](https://github.com/IAforIA/cardputerADV-CSI-Human-detector/releases/latest).
 2. Connect the Cardputer over USB-C and open
    [esptool.spacehuhn.com](https://esptool.spacehuhn.com/) in Chrome or Edge.
 3. **Connect**, choose the port, set the address to `0x0`, select the file,
