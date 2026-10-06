@@ -1,0 +1,88 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 540" font-family="Consolas, 'DejaVu Sans Mono', monospace" font-size="13">
+<rect width="860" height="540" fill="#ffffff"/>
+<text x="40" y="32" font-size="15" font-weight="bold" fill="#222">Cardputer ADV - EXT 2.54-14P</text>
+<text x="40" y="50" fill="#666">viewed from the back, label upright</text>
+<rect x="40" y="112" width="380" height="110" rx="6" fill="#f2f2f2" stroke="#999"/>
+<circle cx="70" cy="145" r="12" fill="#fff" stroke="#555"/>
+<text x="70" y="149" font-size="10" text-anchor="middle" fill="#222">G3</text>
+<circle cx="120" cy="145" r="12" fill="#fff" stroke="#bbb"/>
+<text x="120" y="149" font-size="10" text-anchor="middle" fill="#aaa">G4</text>
+<circle cx="170" cy="145" r="12" fill="#fff" stroke="#555"/>
+<text x="170" y="149" font-size="10" text-anchor="middle" fill="#222">G6</text>
+<circle cx="220" cy="145" r="12" fill="#fff" stroke="#555"/>
+<text x="220" y="149" font-size="10" text-anchor="middle" fill="#222">G40</text>
+<circle cx="270" cy="145" r="12" fill="#fff" stroke="#555"/>
+<text x="270" y="149" font-size="10" text-anchor="middle" fill="#222">G14</text>
+<circle cx="320" cy="145" r="12" fill="#fff" stroke="#bbb"/>
+<text x="320" y="149" font-size="10" text-anchor="middle" fill="#aaa">G39</text>
+<circle cx="370" cy="145" r="12" fill="#fff" stroke="#555"/>
+<text x="370" y="149" font-size="10" text-anchor="middle" fill="#222">G5</text>
+<circle cx="70" cy="195" r="12" fill="#fff" stroke="#bbb"/>
+<text x="70" y="199" font-size="10" text-anchor="middle" fill="#aaa">5VI</text>
+<circle cx="120" cy="195" r="12" fill="#fff" stroke="#555"/>
+<text x="120" y="199" font-size="10" text-anchor="middle" fill="#222">GND</text>
+<circle cx="170" cy="195" r="12" fill="#fff" stroke="#555"/>
+<text x="170" y="199" font-size="10" text-anchor="middle" fill="#222">5VO</text>
+<circle cx="220" cy="195" r="12" fill="#fff" stroke="#bbb"/>
+<text x="220" y="199" font-size="10" text-anchor="middle" fill="#aaa">G8</text>
+<circle cx="270" cy="195" r="12" fill="#fff" stroke="#bbb"/>
+<text x="270" y="199" font-size="10" text-anchor="middle" fill="#aaa">G9</text>
+<circle cx="320" cy="195" r="12" fill="#fff" stroke="#bbb"/>
+<text x="320" y="199" font-size="10" text-anchor="middle" fill="#aaa">G13</text>
+<circle cx="370" cy="195" r="12" fill="#fff" stroke="#bbb"/>
+<text x="370" y="199" font-size="10" text-anchor="middle" fill="#aaa">G15</text>
+<g font-size="10" fill="#888" text-anchor="middle"><text x="54" y="128">1</text><text x="386" y="128">13</text><text x="54" y="216">2</text><text x="386" y="216">14</text></g>
+<text x="600" y="32" font-size="15" font-weight="bold" fill="#222">ILI9341 2.4" SPI module</text>
+<text x="600" y="50" fill="#666">14-pin header, pin 1 = VCC</text>
+<rect x="600" y="70" width="230" height="440" rx="6" fill="#c8102e"/>
+<rect x="620" y="88" width="26" height="14" rx="2" fill="#f5c400" stroke="#8a6d00"/>
+<text x="658" y="99" fill="#ffffff" xml:space="preserve"> 1  VCC</text>
+<rect x="620" y="117" width="26" height="14" rx="2" fill="#f5c400" stroke="#8a6d00"/>
+<text x="658" y="128" fill="#ffffff" xml:space="preserve"> 2  GND</text>
+<rect x="620" y="146" width="26" height="14" rx="2" fill="#f5c400" stroke="#8a6d00"/>
+<text x="658" y="157" fill="#ffffff" xml:space="preserve"> 3  CS</text>
+<rect x="620" y="175" width="26" height="14" rx="2" fill="#f5c400" stroke="#8a6d00"/>
+<text x="658" y="186" fill="#ffffff" xml:space="preserve"> 4  RESET</text>
+<rect x="620" y="204" width="26" height="14" rx="2" fill="#f5c400" stroke="#8a6d00"/>
+<text x="658" y="215" fill="#ffffff" xml:space="preserve"> 5  DC</text>
+<rect x="620" y="233" width="26" height="14" rx="2" fill="#f5c400" stroke="#8a6d00"/>
+<text x="658" y="244" fill="#ffffff" xml:space="preserve"> 6  SDI (MOSI)</text>
+<rect x="620" y="262" width="26" height="14" rx="2" fill="#f5c400" stroke="#8a6d00"/>
+<text x="658" y="273" fill="#ffffff" xml:space="preserve"> 7  SCK</text>
+<rect x="620" y="291" width="26" height="14" rx="2" fill="#f5c400" stroke="#8a6d00"/>
+<text x="658" y="302" fill="#ffffff" xml:space="preserve"> 8  LED</text>
+<rect x="620" y="320" width="26" height="14" rx="2" fill="#f5c400" stroke="#8a6d00"/>
+<text x="658" y="331" fill="#f3b6c0" xml:space="preserve"> 9  SDO (MISO)  (n/c)</text>
+<rect x="620" y="349" width="26" height="14" rx="2" fill="#f5c400" stroke="#8a6d00"/>
+<text x="658" y="360" fill="#f3b6c0" xml:space="preserve">10  T_CLK  (n/c)</text>
+<rect x="620" y="378" width="26" height="14" rx="2" fill="#f5c400" stroke="#8a6d00"/>
+<text x="658" y="389" fill="#f3b6c0" xml:space="preserve">11  T_CS  (n/c)</text>
+<rect x="620" y="407" width="26" height="14" rx="2" fill="#f5c400" stroke="#8a6d00"/>
+<text x="658" y="418" fill="#f3b6c0" xml:space="preserve">12  T_DIN  (n/c)</text>
+<rect x="620" y="436" width="26" height="14" rx="2" fill="#f5c400" stroke="#8a6d00"/>
+<text x="658" y="447" fill="#f3b6c0" xml:space="preserve">13  T_DO  (n/c)</text>
+<rect x="620" y="465" width="26" height="14" rx="2" fill="#f5c400" stroke="#8a6d00"/>
+<text x="658" y="476" fill="#f3b6c0" xml:space="preserve">14  T_IRQ  (n/c)</text>
+<path d="M70 133 V72 H560 V182 H620" fill="none" stroke="#8c564b" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M170 133 V82 H530 V211 H620" fill="none" stroke="#2ca02c" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M220 133 V92 H500 V269 H620" fill="none" stroke="#17becf" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M270 133 V102 H470 V240 H620" fill="none" stroke="#1f77b4" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M382 145 H440 V153 H620" fill="none" stroke="#9467bd" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M120 207 V245 H455 V124 H620" fill="none" stroke="#222" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M170 207 V258 H585 V95 H620" fill="none" stroke="#d62728" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M585 258 V298 H620" fill="none" stroke="#ff7f0e" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="585" cy="258" r="5" fill="#d62728"/>
+<text x="380" y="276" font-size="11" fill="#d62728">Y-splice</text>
+<g font-size="12" fill="#333">
+<text x="40" y="320" font-weight="bold">Connections</text>
+<text x="40" y="344" xml:space="preserve">5V OUT  -> VCC + LED (Y-splice)</text>
+<text x="40" y="364" xml:space="preserve">GND     -> GND</text>
+<text x="40" y="384" xml:space="preserve">G5      -> CS</text>
+<text x="40" y="404" xml:space="preserve">G3      -> RESET</text>
+<text x="40" y="424" xml:space="preserve">G6      -> DC</text>
+<text x="40" y="444" xml:space="preserve">G14     -> SDI (MOSI)</text>
+<text x="40" y="464" xml:space="preserve">G40     -> SCK</text>
+<text x="40" y="498" fill="#c8102e">Never connect anything to 5VIN.</text>
+<text x="40" y="518" fill="#666">No 3V3 on this header: 5 V on VCC needs J1 open.</text>
+</g>
+</svg>
